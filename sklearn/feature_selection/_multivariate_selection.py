@@ -76,4 +76,56 @@ def k_sample_test(X, y,score_func="mgc"):
         stat = mgc.stat 
     return(stat)
 
+######################################################################
+# Selector
+
+class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):    
+    #Unparallelized
+    def __init__(self, k=10):
+        self.k = k
+        
+    def fit(self, X, y,workers = -1):
+        features = np.arange(X.shape[1])
+         
+        if type(self.k) != int:
+            raise ValueError("k features to select must be integer")
+        if not 0 <= self.k <= X.shape[1]:
+                raise ValueError("k features to select must be a non-negative integer that is less than or equal to n_features of X")
+        if not X.shape[0] >= 5:
+                raise ValueError("n_samples of data matrix X must be >= 5 in order to perform k_sample multivariate independence test")
+        
+        best_features = []
+        while (len(best_features) < self.k):  
+            X_new = np.array(X)
+            scores = []
+            for i in features:
+                if np.var(X_new[:,i]) == 0:
+                    stat = -1000.0
+                else:   
+                    if len(best_features)==0:
+                        X_j = X_new[:,i] 
+                        stat= k_sample_test(X_j,y)
+                    else:
+                        columns = best_features 
+                        columns.append(i)
+                        X_j = X_new[:,columns]
+                        stat= k_sample_test(X_j,y)
+                scores.append(stat)
+            scores_index = np.zeros((len(features),2)) 
+            scores_index[:,0] = features 
+            scores_index[:,1] = scores 
+            sorted_index = scores_index[scores_index[:, 1].argsort()] 
+            best = sorted_index[len(scores)-1,0] 
+            best_features.append(int(best))  
+            features = np.delete(features,np.where(features == best))
+        self.best_features_ = best_features
+        self.features_ = np.arange(X.shape[1])
+        return self
+    
+    def _get_support_mask(self):
+        check_is_fitted(self)
+        return  np.array([x in self.best_features_ for x in self.features_])
+    
+    def _more_tags(self):
+        return {"allow_nan": True,"requires_y": True}
 
