@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[3]:
+
+
+import itertools
+import numpy as np
+from scipy import stats, sparse
+import pytest
+from sklearn.feature_selection import MultivariateFeatureSelector,k_sample_test
+from sklearn.utils._testing import assert_array_equal
+from sklearn.datasets import make_classification
+
+def test_k_sample_test():
+    #Make sure k_sample_test produces scores as expected 
+    X, y = make_classification(
+        n_samples=200,
+        n_features=20,
+        n_informative=3,
+        n_redundant=2,
+        n_repeated=0,
+        n_classes=8,
+        n_clusters_per_class=1,
+        flip_y=0.0,
+        class_sep=10,
+        shuffle=False,
+        random_state=0,
+    )
+
+    F = k_sample_test(X,y)
+    assert (F >= -1)
+    assert (F <= 1)
+
+def test_sparse_support():
+    #Make sure sparse data is supported
+    X, y = make_classification(
+        n_samples=200,
+        n_features=20,
+        n_informative=3,
+        n_redundant=2,
+        n_repeated=0,
+        n_classes=8,
+        n_clusters_per_class=1,
+        flip_y=0.0,
+        class_sep=10,
+        shuffle=False,
+        random_state=0,
+    )
+    sequential_filter = MultivariateFeatureSelector(k = 4)
+    sequential_filter.fit(sparse.csr_matrix(X),y)
+    sequential_filter.transform(sparse.csr_matrix(X))
+    
+
+def test_multivariate_feature_selector():
+    #Make sure that selector selects informative features
+    X, y = make_classification(
+        n_samples=200,
+        n_features=20,
+        n_informative=5,
+        n_redundant=0,
+        n_repeated=0,
+        n_classes=8,
+        n_clusters_per_class=1,
+        flip_y=0.0,
+        class_sep=10,
+        shuffle=False,
+        random_state=0,
+    )
+    sequential_filter = MultivariateFeatureSelector(k = 5)
+    sequential_filter.fit(X,y)
+    support = sequential_filter.get_support()
+    gtruth = np.zeros(20)
+    gtruth[:5] = 1
+    assert_array_equal(support, gtruth)
+
+def test_invalid_sample_size():
+    X = np.array([[10, 20], [20, 20], [20, 30]])
+    y = np.array([[1], [0], [0]])
+    with pytest.raises(ValueError):
+        MultivariateFeatureSelector(k=1).fit(X, y)
+
+def test_invalid_k():
+    #Test selector with invalid k input
+    X, y = make_classification(
+        n_samples=200,
+        n_features=20,
+        n_informative=3,
+        n_redundant=2,
+        n_repeated=0,
+        n_classes=8,
+        n_clusters_per_class=1,
+        flip_y=0.0,
+        class_sep=10,
+        shuffle=False,
+        random_state=0,
+    )
+    with pytest.raises(ValueError):
+        MultivariateFeatureSelector(k=-1).fit(X, y)
+    with pytest.raises(ValueError):
+        MultivariateFeatureSelector(k=21).fit(X, y)
+    with pytest.raises(ValueError):
+        MultivariateFeatureSelector(k=2.7).fit(X, y)
+    
+    
+def test_boundary_case():
+    # Test boundary case, and always aim to select 1 feature.
+    X = np.array([[10, 20], [20, 20], [20, 30], [20,30],[20,20]])
+    y = np.array([[1], [0], [0],[0],[0]])
+    multivariate =  MultivariateFeatureSelector(k=1)
+    multivariate.fit(X, y)
+    support_multivariate = multivariate.get_support()
+    assert_array_equal(support_multivariate, np.array([True, False]))
+
