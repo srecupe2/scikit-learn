@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[40]:
 
 
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection import SelectorMixin
 import numpy as np
 from scipy.stats import multiscale_graphcorr
+from scipy.sparse import isspmatrix
 from scipy._lib._util import MapWrapper
 import warnings
 from sklearn.utils.validation import check_is_fitted
@@ -166,6 +167,9 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         self : object
             Returns the instance itself.
         """
+        if (isspmatrix(X) == True):
+            X = X.toarray()
+        
         features = np.arange(X.shape[1])
          
         if type(self.k) != int:
