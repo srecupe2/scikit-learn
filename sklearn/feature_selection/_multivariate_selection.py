@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[ ]:
 
 
 from sklearn.base import BaseEstimator
@@ -110,6 +110,17 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
     
     best_features_ : array, shape (k,)
          indices of selected k best features of features_
+         
+    Examples
+    --------
+    >>> from sklearn.datasets import load_digits
+    >>> from sklearn.feature_selection import MultivariateFeatureSelector
+    >>> X, y = load_digits(return_X_y=True)
+    >>> X.shape
+    (1797, 64)
+    >>> X_new = MultivariateFeatureSelector(k = 7).fit_transform(X, y)
+    >>> X_new.shape
+    (1797, 7)
     """
     
     def __init__(self, k=10):
