@@ -145,9 +145,3 @@ def test_boundary_case():
     support_multivariate = multivariate.get_support()
     assert_array_equal(support_multivariate, np.array([True, False]))
 
-
-# In[ ]:
-
-
-
-
