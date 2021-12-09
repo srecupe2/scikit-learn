@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[40]:
+# In[58]:
 
 
 from sklearn.base import BaseEstimator
@@ -167,11 +167,13 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         self : object
             Returns the instance itself.
         """
-        if (isspmatrix(X) == True):
+        if isspmatrix(X) == True:
             X = X.toarray()
         
         features = np.arange(X.shape[1])
-         
+        
+        if np.isnan(X).any() == True:
+            raise ValueError("existing non-parametric multivariate independence tests in scipy do not allow nan")
         if type(self.k) != int:
             raise ValueError("k features to select must be integer")
         if not 0 <= self.k <= X.shape[1]:
@@ -182,7 +184,7 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         #loop to select k best features, 
         #each iteration adds next best feature
         best_features = []
-        while (len(best_features) < self.k): 
+        while len(best_features) < self.k: 
             X_new = np.array(X)
             
             #Mapwrapper parallelizes test statistic calculations 
@@ -209,5 +211,5 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         return  np.array([x in self.best_features_ for x in self.features_])
     
     def _more_tags(self):
-        return {"allow_nan": True,"requires_y": True}
+        return {"allow_nan": False,"requires_y": True}
 
