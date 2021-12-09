@@ -10,6 +10,7 @@ import numpy as np
 from scipy.stats import multiscale_graphcorr
 from scipy._lib._util import MapWrapper
 import warnings
+from sklearn.utils.validation import check_is_fitted
 
 ######################################################################
 # Scoring function
@@ -48,7 +49,6 @@ def k_sample_test(X, y,score_func="mgc"):
     paired. Then, any multivariate nonparametric test can be performed on
     this data.
     """
-    
     #extract data matrix of shape (_samples,_features) for each group
     k_array = np.unique(y)
     matrices = []
@@ -74,17 +74,87 @@ def k_sample_test(X, y,score_func="mgc"):
         warnings.filterwarnings("ignore")
         mgc = multiscale_graphcorr(X,y,reps = 0)
         stat = mgc.stat 
+    #default
+    else:
+        warnings.filterwarnings("ignore")
+        mgc = multiscale_graphcorr(X,y,reps = 0)
+        stat = mgc.stat 
     return(stat)
 
 ######################################################################
-# Selector
+# Transformer
 
-class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):    
-    #Unparallelized
+class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
+    """ Transformer that performs forward selection.
+    
+    This feature selector adds features (forward selection) to
+    form a feature subset. At each iteration, a parallel 
+    operation occurs in which a multivariate independence test 
+    is performed for each data matrix with the selected best 
+    features and an additional feature not yet selected. The 
+    additional feature associated with the highest multivariate
+    independence test statistic is then chosen as the next best 
+    feature. 
+    
+    Read more in the :ref:`User Guide <multivariate_feature_selection>`.
+    
+    Parameters
+    ----------
+    k: int, default=10
+        amount of features to select. 
+        
+    Attributes
+    ----------
+    features_ : array, shape (n_features,)
+        indices of all features in X
+    
+    best_features_ : array, shape (k,)
+         indices of selected k best features of features_
+    """
+    
     def __init__(self, k=10):
         self.k = k
         
+    class _Parallel:
+        #helper class for calculating, in parallel, 
+        #test statistic associated with
+        #selected best features and an additional feature 
+        def __init__(self, X_new, y,best_features):
+            self.X_new = X_new
+            self.y = y
+            self.best_feat = best_features
+
+        def __call__(self, index):
+            if np.var(self.X_new[:,index]) == 0:
+                stat = -1000.0
+            else:   
+                if len(self.best_feat)==0:
+                    X_j =  self.X_new[:,index] 
+                    stat= k_sample_test(X_j,self.y)
+                else:
+                    columns = self.best_feat 
+                    columns.append(index)
+                    X_j = self.X_new[:,columns]
+                    stat= k_sample_test(X_j,self.y)
+            return stat
+        
+        
     def fit(self, X, y,workers = -1):
+        """Learn the features to select from X.
+        
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training vectors, where `n_samples` is the number of samples and
+            `n_features` is the number of predictors.
+        y : array-like of shape (n_samples,), default=None
+            Target values. 
+        
+        Returns
+        -------
+        self : object
+            Returns the instance itself.
+        """
         features = np.arange(X.shape[1])
          
         if type(self.k) != int:
@@ -94,29 +164,26 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         if not X.shape[0] >= 5:
                 raise ValueError("n_samples of data matrix X must be >= 5 in order to perform k_sample multivariate independence test")
         
+        #loop to select k best features, 
+        #each iteration adds next best feature
         best_features = []
-        while (len(best_features) < self.k):  
+        while (len(best_features) < self.k): 
             X_new = np.array(X)
-            scores = []
-            for i in features:
-                if np.var(X_new[:,i]) == 0:
-                    stat = -1000.0
-                else:   
-                    if len(best_features)==0:
-                        X_j = X_new[:,i] 
-                        stat= k_sample_test(X_j,y)
-                    else:
-                        columns = best_features 
-                        columns.append(i)
-                        X_j = X_new[:,columns]
-                        stat= k_sample_test(X_j,y)
-                scores.append(stat)
+            
+            #Mapwrapper parallelizes test statistic calculations 
+            #of selected best features and each additional feature.
+            #size of operations in parallel per loop iteration is 
+            #n_features - len(best_features)
+            parallel = self._Parallel(X_new=X_new, y=y,best_features = best_features)
+            with MapWrapper(workers) as mapwrapper:
+                scores = list(mapwrapper(parallel, features)) 
+            
             scores_index = np.zeros((len(features),2)) 
             scores_index[:,0] = features 
             scores_index[:,1] = scores 
             sorted_index = scores_index[scores_index[:, 1].argsort()] 
             best = sorted_index[len(scores)-1,0] 
-            best_features.append(int(best))  
+            best_features.append(int(best)) 
             features = np.delete(features,np.where(features == best))
         self.best_features_ = best_features
         self.features_ = np.arange(X.shape[1])
