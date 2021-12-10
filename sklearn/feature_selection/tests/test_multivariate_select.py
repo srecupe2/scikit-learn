@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
+# In[ ]:
 
 
 import itertools
@@ -17,8 +17,8 @@ def test_k_sample_test():
     X, y = make_classification(
         n_samples=200,
         n_features=20,
-        n_informative=3,
-        n_redundant=2,
+        n_informative=4,
+        n_redundant=1,
         n_repeated=0,
         n_classes=8,
         n_clusters_per_class=1,
@@ -37,8 +37,8 @@ def test_sparse_support():
     X, y = make_classification(
         n_samples=200,
         n_features=20,
-        n_informative=3,
-        n_redundant=2,
+        n_informative=4,
+        n_redundant=1,
         n_repeated=0,
         n_classes=8,
         n_clusters_per_class=1,
@@ -57,8 +57,8 @@ def test_multivariate_feature_selector():
     X, y = make_classification(
         n_samples=200,
         n_features=20,
-        n_informative=5,
-        n_redundant=0,
+        n_informative=4,
+        n_redundant=1,
         n_repeated=0,
         n_classes=8,
         n_clusters_per_class=1,
@@ -86,8 +86,8 @@ def test_invalid_k():
     X, y = make_classification(
         n_samples=200,
         n_features=20,
-        n_informative=3,
-        n_redundant=2,
+        n_informative=4,
+        n_redundant=1,
         n_repeated=0,
         n_classes=8,
         n_clusters_per_class=1,
@@ -109,8 +109,8 @@ def test_nan():
     X, y = make_classification(
         n_samples=200,
         n_features=20,
-        n_informative=3,
-        n_redundant=2,
+        n_informative=4,
+        n_redundant=1,
         n_repeated=0,
         n_classes=8,
         n_clusters_per_class=1,
