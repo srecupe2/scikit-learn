@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[58]:
+# In[15]:
 
 
 from sklearn.base import BaseEstimator
@@ -28,7 +28,7 @@ def k_sample_test(X, y,score_func="mgc"):
     
     Parameters
     ----------
-    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features)
         Sample vectors.
     y : ndarray of shape (n_samples,)
         The target vector.
@@ -144,7 +144,7 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
                     X_j =  self.X_new[:,index] 
                     stat= k_sample_test(X_j,self.y)
                 else:
-                    columns = self.best_feat 
+                    columns = self.best_feat.copy() 
                     columns.append(index)
                     X_j = self.X_new[:,columns]
                     stat= k_sample_test(X_j,self.y)
@@ -194,7 +194,6 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
             parallel = self._Parallel(X_new=X_new, y=y,best_features = best_features)
             with MapWrapper(workers) as mapwrapper:
                 scores = list(mapwrapper(parallel, features)) 
-            
             scores_index = np.zeros((len(features),2)) 
             scores_index[:,0] = features 
             scores_index[:,1] = scores 
