@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[118]:
-
+"""Multivariate features selection."""
+# Authors: S. Panda, S. Recupero
+# License: BSD 3 clause
 
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection import SelectorMixin
