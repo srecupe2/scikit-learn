@@ -82,16 +82,11 @@ def k_sample_test(X, y,score_func="mgc"):
         vs.append(encode)
     y = np.concatenate(vs)
     
-    # mgc case
-    if score_func == "mgc":
+    # default, which is mgc case
+    with warnings.catch_warnings():
         warnings.filterwarnings("ignore")
         mgc = multiscale_graphcorr(X,y,reps = 0)
-        stat = mgc.stat 
-    # default
-    else:
-        warnings.filterwarnings("ignore")
-        mgc = multiscale_graphcorr(X,y,reps = 0)
-        stat = mgc.stat 
+    stat = mgc.stat 
     return stat
 
 ######################################################################
@@ -146,14 +141,10 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         if np.var(X_new[:,index]) == 0:
             stat = -1.0
         else:   
-            if len(best_features)==0:
-                X_j =  X_new[:,index] 
-                stat = k_sample_test(X_j,y)
-            else:
-                columns = best_features.copy() 
-                columns.append(index)
-                X_j = X_new[:,columns]
-                stat = k_sample_test(X_j,y)
+            columns = best_features.copy() 
+            columns.append(index)
+            X_j = X_new[:,columns]
+            stat = k_sample_test(X_j,y)
         return stat
         
         
@@ -176,16 +167,19 @@ class MultivariateFeatureSelector(SelectorMixin, BaseEstimator):
         if isspmatrix(X) == True:
             X = X.toarray()
         
+        # array of indices that correspond to features,
+        # at each iteration, the selected best feature
+        # is removed from this array
         features = np.arange(X.shape[1])
         
         if np.isnan(X).any() == True:
             raise ValueError("existing multivariate independence tests in scipy do not allow nan")
         if type(self.k) is not int:
-            raise TypeError("k is type {}, must be int where {} is type(k)")
+            raise TypeError("k is type {}, must be int".format(type(self.k)))
         if not 0 < self.k and self.k <= X.shape[1]:
-                raise ValueError("k is {}, must be nonnegative <= number of features of X where {} is k")
+                raise ValueError("k is {}, must be nonnegative <= number of features of X".format(self.k))
         if not X.shape[0] >= 5:
-                raise ValueError("number of samples is {}, must be >= 5 where {} is X.shape[0]")
+                raise ValueError("number of samples is {}, must be >= 5".format(X.shape[0]))
         
         # loop to select feature subset, 
         # each iteration adds next best feature as 
