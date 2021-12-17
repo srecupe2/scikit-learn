@@ -16,6 +16,9 @@ from ._univariate_selection import SelectFdr
 from ._univariate_selection import SelectFwe
 from ._univariate_selection import GenericUnivariateSelect
 
+from ._multivariate_selection import k_sample_test
+from ._multivariate_selection import MultivariateFeatureSelector
+
 from ._variance_threshold import VarianceThreshold
 
 from ._rfe import RFE
@@ -42,6 +45,8 @@ __all__ = [
     "SelectFromModel",
     "SelectPercentile",
     "VarianceThreshold",
+    "MultivariateFeatureSelector",
+    "k_sample_test"
     "chi2",
     "f_classif",
     "f_oneway",
@@ -51,3 +56,4 @@ __all__ = [
     "mutual_info_regression",
     "SelectorMixin",
 ]
+
