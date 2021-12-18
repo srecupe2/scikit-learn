@@ -113,6 +113,44 @@ samples for accurate estimation.
 
     * :ref:`sphx_glr_auto_examples_feature_selection_plot_f_test_vs_mi.py`
 
+.. _multivariate_feature_selection:
+Multivariate Feature Selection
+============================
+
+Multivariate Feature Selector is available in the
+:class:`~sklearn.feature_selection.MultivariateFeatureSelector` transformer.
+
+Multivariate feature selection occurs only in a forward manner and is only 
+for classification problems. We start with zero features and then we calculate 
+a test statistic for each feature using a given multivariate independence test 
+through :func: `k_sample_test`, in which the k-sample testing problem is reduced 
+to an independence testing problem. The feature associated with the best test 
+statistic is selected as the first elementin the feature subset. In the next 
+iteration we calculate a test statistic for each feature pair of the already 
+selected best feature and each additional feature.The additional feature associated 
+with the best test statistic is chosen as the next feature in the feature subset. 
+This process continues until we have chosen a subset of 'k' features.  
+
+With regards to certain classfication problems, the MultivariateFeatureSelector
+can capture dependencies between features that univariate feature selection 
+is not able to capture. 
+
+Multivariate feature selection differs from 
+:class:`~sklearn.feature_selection.SequentialFeatureSelector` in that an 
+estimator is not trained in the process of building a feature subset, but instead
+a multivariate independence test determines the next feature to add to the feature
+subset.
+
+.. topic:: Examples:
+
+    * :ref:`sphx_glr_auto_examples_multivariate_feature_selection_plot_feature_selection.py`
+
+.. topic:: References:
+
+   .. [1] Sambit Panda, Cencheng Shen, Ronan Perry, Jelle Zorn, Antoine Lutz, 
+          Carey E. Priebe, and Joshua T. Vogelstein. Nonpar MANOVA via 
+          Independence Testing. arXiv:1910.08883 [cs, stat], April 2021. 
+
 .. _rfe:
 
 Recursive feature elimination
@@ -305,7 +343,7 @@ fit and requires no iterations.
 
 .. topic:: References:
 
-   .. [sfs] Ferri et al, `Comparative study of techniques for
+    .. [sfs] Ferri et al, `Comparative study of techniques for
       large-scale feature selection
       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.24.4369&rep=rep1&type=pdf>`_.
 
