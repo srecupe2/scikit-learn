@@ -1,14 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
+import pytest
 import itertools
 import numpy as np
 from scipy import stats, sparse
-import pytest
-from sklearn.feature_selection import MultivariateFeatureSelector,k_sample_test
+from sklearn.feature_selection import MultivariateFeatureSelector, k_sample_test
 from sklearn.utils._testing import assert_array_equal
 from sklearn.datasets import make_classification
 
@@ -81,7 +75,9 @@ def test_invalid_sample_size():
     with pytest.raises(ValueError):
         MultivariateFeatureSelector(k=1).fit(X, y)
 
-def test_invalid_k():
+@pytest.mark.parametrize("k, expected",
+                         [(-1, ValueError), (21, ValueError), (2.7, TypeError)])
+def test_invalid_k(k, expected):
     #Test selector with invalid k input
     X, y = make_classification(
         n_samples=200,
@@ -96,12 +92,8 @@ def test_invalid_k():
         shuffle=False,
         random_state=0,
     )
-    with pytest.raises(ValueError):
-        MultivariateFeatureSelector(k=-1).fit(X, y)
-    with pytest.raises(ValueError):
-        MultivariateFeatureSelector(k=21).fit(X, y)
-    with pytest.raises(ValueError):
-        MultivariateFeatureSelector(k=2.7).fit(X, y)
+    with pytest.raises(expected):
+        MultivariateFeatureSelector(k).fit(X, y)
 
 def test_nan():
     # Test for nan, existing non-parametric multivariate independence tests in scipy
