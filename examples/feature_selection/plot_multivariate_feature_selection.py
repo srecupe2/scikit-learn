@@ -5,9 +5,9 @@
 
 
 """
-============================
+==============================
 Multivariate Feature Selection
-============================
+==============================
 An example showing multivariate feature selection.
 Noisy (non informative) features are added to the wine data and
 multivariate feature selection is applied. For each feature, we plot the
