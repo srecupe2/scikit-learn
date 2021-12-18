@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 """
 ============================
 Multivariate Feature Selection
@@ -23,6 +29,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import make_pipeline
+from sklearn.feature_selection import MultivariateFeatureSelector, k_sample_test
 
 # #############################################################################
 # Import some data to play with
