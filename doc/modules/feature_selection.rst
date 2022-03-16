@@ -120,12 +120,12 @@ Multivariate Feature Selection
 Multivariate Feature Selector is available in the
 :class:`~sklearn.feature_selection.MultivariateFeatureSelector` transformer.
 
-Multivariate feature selection occurs only in a forward manner and is only 
+Multivariate Feature Selection occurs only in a forward manner and is only 
 for classification problems. We start with zero features and then we calculate 
 a test statistic for each feature using a given multivariate independence test 
 through :func: `k_sample_test`, in which the k-sample testing problem is reduced 
 to an independence testing problem. The feature associated with the best test 
-statistic is selected as the first elementin the feature subset. In the next 
+statistic is selected as the first element in the feature subset. In the next 
 iteration we calculate a test statistic for each feature pair of the already 
 selected best feature and each additional feature.The additional feature associated 
 with the best test statistic is chosen as the next feature in the feature subset. 
