@@ -117,10 +117,10 @@ samples for accurate estimation.
 Multivariate Feature Selection
 ============================
 
-Multivariate Feature Selector is available in the
+MultivariateFeatureSelector is available in the
 :class:`~sklearn.feature_selection.MultivariateFeatureSelector` transformer.
 
-Multivariate Feature Selection occurs only in a forward manner and is only 
+MultivariateFeatureSelectOR occurs only in a forward manner and is only 
 for classification problems. We start with zero features and then we calculate 
 a test statistic for each feature using a given multivariate independence test 
 through :func: `k_sample_test`, in which the k-sample testing problem is reduced 
@@ -135,7 +135,7 @@ With regards to certain classfication problems, the MultivariateFeatureSelector
 can capture dependencies between features that univariate feature selection 
 is not able to capture. 
 
-Multivariate feature selection differs from 
+MultivariateFeatureSelector differs from 
 :class:`~sklearn.feature_selection.SequentialFeatureSelector` in that an 
 estimator is not trained in the process of building a feature subset, but instead
 a multivariate independence test determines the next feature to add to the feature
